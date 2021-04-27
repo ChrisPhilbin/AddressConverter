@@ -38,27 +38,27 @@ const App = () => {
 
   const verifyAddresses = () => {
     let newArr = []
-    rawAddresses.map((address) =>{
+    rawAddresses.map((address) => {
       fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_G_API}`)
       .then(response => response.json())
       .then(data => {
         let r = data.results[0].address_components
         newArr.push(r)
+        setVerifiedAddresses((verifiedAddresses) => [...verifiedAddresses, r])
       })
     })
-    setVerifiedAddresses(newArr)
-    setIsVerified(true)
+    // setIsVerified(true)
   }
 
-  const renderAddresses = (
-      <>
-        {verifiedAddresses.map((address) => (
-          <div>
-            {address[0].long_name} {address[1].long_name} {address[2].long_name} {address[5].long_name} {address[7].long_name}
-          </div>
-        ))}
-      </>
-    )
+  // const renderAddresses = (
+  //     <>
+  //       {verifiedAddresses.map((address) => (
+  //         <div>
+  //           {address[0].long_name} {address[1].long_name} {address[2].long_name} {address[5].long_name} {address[7].long_name}
+  //         </div>
+  //       ))}
+  //     </>
+  //   )
 
   console.log(rawAddresses, "raw addresses")
   console.log(verifiedAddresses, "verified addresses")
@@ -70,7 +70,7 @@ const App = () => {
       { file ? <Button onClick={() => handleConvert(extract)}>Convert</Button> : null}
       <Button onClick={() => verifyAddresses()}>Verify Addresses</Button>
     
-      { isVerified? {renderAddresses} : null }
+      {/* { isVerified? {renderAddresses} : null } */}
 
     </Container>
   )
