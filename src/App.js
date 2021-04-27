@@ -8,10 +8,12 @@ import Input from '@material-ui/core/Input'
 
 const App = () => {
 
-  let [file, setFile]           = useState(null)
-  let [cols, setCols]           = useState(null)
-  let [rows, setRows]           = useState(null)
-  let [rawAddresses, setRawAddresses] = useState([])
+  let [file, setFile]                           = useState(null)
+  let [cols, setCols]                           = useState(null)
+  let [rows, setRows]                           = useState(null)
+  let [rawAddresses, setRawAddresses]           = useState([])
+  let [verifiedAddresses, setVerifiedAddresses] = useState([])
+  let [isVerified, setIsVerified]               = useState(false)
 
   function handleConvert(extractCallback) {
     ExcelRenderer(file, (err, resp) => {
@@ -35,15 +37,31 @@ const App = () => {
   }
 
   const verifyAddresses = () => {
+    let newArr = []
     rawAddresses.map((address) =>{
       fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_G_API}`)
       .then(response => response.json())
-      .then(data => console.log(data, "data from google maps api"))
+      .then(data => {
+        let r = data.results[0].address_components
+        newArr.push(r)
+      })
     })
+    setVerifiedAddresses(newArr)
+    setIsVerified(true)
   }
 
+  const renderAddresses = (
+      <>
+        {verifiedAddresses.map((address) => (
+          <div>
+            {address[0].long_name} {address[1].long_name} {address[2].long_name} {address[5].long_name} {address[7].long_name}
+          </div>
+        ))}
+      </>
+    )
 
   console.log(rawAddresses, "raw addresses")
+  console.log(verifiedAddresses, "verified addresses")
 
   return (
     <Container>
@@ -51,8 +69,10 @@ const App = () => {
       <Input type="file" onChange={(e) => setFile(e.target.files[0]) } />
       { file ? <Button onClick={() => handleConvert(extract)}>Convert</Button> : null}
       <Button onClick={() => verifyAddresses()}>Verify Addresses</Button>
-    </Container>
+    
+      { isVerified? {renderAddresses} : null }
 
+    </Container>
   )
 }
 
