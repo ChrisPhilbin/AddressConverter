@@ -11,35 +11,46 @@ const App = () => {
   let [file, setFile]           = useState(null)
   let [cols, setCols]           = useState(null)
   let [rows, setRows]           = useState(null)
-  let [addresses, setAddresses] = useState([])
+  let [rawAddresses, setRawAddresses] = useState([])
 
-  const handleConvert = () => {
+  function handleConvert(extractCallback) {
     ExcelRenderer(file, (err, resp) => {
       if(err){
         console.log(err)
       } else {
-        setCols(resp.cols)
-        setRows(resp.rows)
+        extractCallback(resp.rows)
       }
     })
+
   }
 
-  const extract = () => {
+  const extract = (rows) => {
+    console.log(rows, "rows passed in to extract")
+    let newArr = []
     rows.slice(1).map((row) => {
       let a = row[2].match(/\(([^)]+)\)/)[1]
-      setAddresses(addresses => [...addresses, a])
+      newArr.push(a)
+    })
+    setRawAddresses(newArr)
+  }
+
+  const verifyAddresses = () => {
+    rawAddresses.map((address) =>{
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_G_API}`)
+      .then(response => response.json())
+      .then(data => console.log(data, "data from google maps api"))
     })
   }
 
-  console.log(rows, "rows")
-  console.log(addresses, "addresses")
+
+  console.log(rawAddresses, "raw addresses")
 
   return (
     <Container>
       <Typography variant="h4">Step 1: Upload file</Typography>
       <Input type="file" onChange={(e) => setFile(e.target.files[0]) } />
-      { file ? <Button onClick={() => handleConvert()}>Convert</Button> : null}
-      <Button onClick={() => extract()}>Extract</Button>
+      { file ? <Button onClick={() => handleConvert(extract)}>Convert</Button> : null}
+      <Button onClick={() => verifyAddresses()}>Verify Addresses</Button>
     </Container>
 
   )
