@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import {ExcelRenderer, OutTable} from 'react-excel-renderer'
+import {ExcelRenderer} from 'react-excel-renderer'
 import Container from '@material-ui/core/Container'
-import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Input from '@material-ui/core/Input'
@@ -9,8 +8,6 @@ import Input from '@material-ui/core/Input'
 const App = () => {
 
   let [file, setFile]                           = useState(null)
-  let [cols, setCols]                           = useState(null)
-  let [rows, setRows]                           = useState(null)
   let [rawAddresses, setRawAddresses]           = useState([])
   let [verifiedAddresses, setVerifiedAddresses] = useState([])
   let [isVerified, setIsVerified]               = useState(false)
@@ -27,7 +24,6 @@ const App = () => {
   }
 
   const extract = (rows) => {
-    console.log(rows, "rows passed in to extract")
     let newArr = []
     rows.slice(1).map((row) => {
       let a = row[2].match(/\(([^)]+)\)/)[1]
@@ -47,21 +43,11 @@ const App = () => {
         setVerifiedAddresses((verifiedAddresses) => [...verifiedAddresses, r])
       })
     })
-    // setIsVerified(true)
+    setIsVerified(true)
   }
 
-  // const renderAddresses = (
-  //     <>
-  //       {verifiedAddresses.map((address) => (
-  //         <div>
-  //           {address[0].long_name} {address[1].long_name} {address[2].long_name} {address[5].long_name} {address[7].long_name}
-  //         </div>
-  //       ))}
-  //     </>
-  //   )
-
-  console.log(rawAddresses, "raw addresses")
   console.log(verifiedAddresses, "verified addresses")
+  console.log(isVerified, "is verified?")
 
   return (
     <Container>
@@ -70,7 +56,15 @@ const App = () => {
       { file ? <Button onClick={() => handleConvert(extract)}>Convert</Button> : null}
       <Button onClick={() => verifyAddresses()}>Verify Addresses</Button>
     
-      {/* { isVerified? {renderAddresses} : null } */}
+      { isVerified? 
+        <>
+          {verifiedAddresses.map((address) => (
+            <div>
+              {address[0].long_name} {address[1].long_name} {address[2].long_name} {address[5].long_name} {address[7].long_name}
+            </div>
+          ))}
+        </>
+      : null }
 
     </Container>
   )
