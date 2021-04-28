@@ -24,30 +24,53 @@ const App = () => {
   }
 
   const extract = (rows) => {
+
+    //first get the index values of the rows to find where firstname, lastname, address live
+    let indexValues = {}
+
+    rows[0].forEach((row, index) => {
+        if (row.includes('first')) {
+            indexValues.firstName = index
+        }
+        if (row.includes('last')) {
+            indexValues.lastName = index
+        }
+        if (row.includes('other')) {
+            indexValues.address = index
+        }
+    })
     let newArr = []
+    let personDetails = {}
+    //iterate over the each row again and find the text that is in between ( and )
     rows.slice(1).map((row) => {
-      let a = row[2].match(/\(([^)]+)\)/)[1]
-      newArr.push(a)
+      personDetails.firstName = row[indexValues.firstName]
+      personDetails.lastName = row[indexValues.lastName]
+      personDetails.address = row[indexValues.address].match(/\(([^)]+)\)/)[1]
+      newArr.push(personDetails)
     })
     setRawAddresses(newArr)
   }
 
   const verifyAddresses = () => {
+    let verifiedPerson = {}
     let newArr = []
-    rawAddresses.map((address) => {
-      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_G_API}`)
+    rawAddresses.map((details) => {
+      console.log(details, "details to find firstname")
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${details.address}&key=${process.env.REACT_APP_G_API}`)
       .then(response => response.json())
       .then(data => {
-        let r = data.results[0].address_components
-        newArr.push(r)
-        setVerifiedAddresses((verifiedAddresses) => [...verifiedAddresses, r])
+        verifiedPerson.address = data.results[0].address_components
+        verifiedPerson.firstName = details.firstName
+        verifiedPerson.lastName = details.lastName
+        newArr.push(verifiedPerson)
+        // setVerifiedAddresses((verifiedAddresses) => [...verifiedAddresses, verifiedPerson])
       })
     })
+    setVerifiedAddresses(newArr)
     setIsVerified(true)
   }
 
   console.log(verifiedAddresses, "verified addresses")
-  console.log(isVerified, "is verified?")
 
   return (
     <Container>
