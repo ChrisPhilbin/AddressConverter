@@ -24,7 +24,6 @@ const App = () => {
   }
 
   const extract = (rows) => {
-
     //first get the index values of the rows to find where firstname, lastname, address live
     let indexValues = {}
 
@@ -41,41 +40,40 @@ const App = () => {
     })
     let newArr = []
     let personDetails = {}
-    //iterate over the each row again and find the text that is in between ( and )
-    rows.slice(1).map((row) => {
-      personDetails.firstName = row[indexValues.firstName]
-      personDetails.lastName = row[indexValues.lastName]
-      personDetails.address = row[indexValues.address].match(/\(([^)]+)\)/)[1]
+    rows.slice(1).forEach((row) => {
+      personDetails["firstName"] = row[indexValues.firstName]
+      personDetails["lastName"] = row[indexValues.lastName]
+      personDetails["address"] = row[indexValues.address].match(/\(([^)]+)\)/)[1]
       newArr.push(personDetails)
     })
-    setRawAddresses(newArr)
+    setRawAddresses(rawAddresses => [...rawAddresses, newArr])
   }
 
-  const verifyAddresses = () => {
-    let verifiedPerson = {}
-    let newArr = []
-    rawAddresses.map((details) => {
-      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${details.address}&key=${process.env.REACT_APP_G_API}`)
-      .then(response => response.json())
-      .then(data => {
-        verifiedPerson.address = data.results[0].address_components
-        verifiedPerson.firstName = details.firstName
-        verifiedPerson.lastName = details.lastName
-        newArr.push(verifiedPerson)
-      })
-    })
-    setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, newArr])
-    setIsVerified(true)
-  }
+  // const verifyAddresses = () => {
+  //   let verifiedPerson = {}
+  //   let newArr = []
+  //   rawAddresses.map((details) => {
+  //     fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${details.address}&key=${process.env.REACT_APP_G_API}`)
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       verifiedPerson.address = data.results[0].address_components
+  //       verifiedPerson.firstName = details.firstName
+  //       verifiedPerson.lastName = details.lastName
+  //     })
+  //     .then(newArr.push(verifiedPerson))
+  //   })
+  //   setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, newArr])
+  //   setIsVerified(true)
+  // }
 
   return (
     <Container>
       <Typography variant="h4">Step 1: Upload file</Typography>
       <Input type="file" onChange={(e) => setFile(e.target.files[0]) } />
       { file ? <Button onClick={() => handleConvert(extract)}>Convert</Button> : null}
-      <Button onClick={() => verifyAddresses()}>Verify Addresses</Button>
+      {/* <Button onClick={() => verifyAddresses()}>Verify Addresses</Button> */}
     
-      { isVerified? 
+      {/* { isVerified? 
         <>
           {verifiedAddresses.map((address) => (
             <div>
@@ -84,7 +82,7 @@ const App = () => {
             </div>
           ))}
         </>
-      : null }
+      : null } */}
 
     </Container>
   )
