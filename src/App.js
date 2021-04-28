@@ -55,7 +55,6 @@ const App = () => {
     let verifiedPerson = {}
     let newArr = []
     rawAddresses.map((details) => {
-      console.log(details, "details to find firstname")
       fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${details.address}&key=${process.env.REACT_APP_G_API}`)
       .then(response => response.json())
       .then(data => {
@@ -63,14 +62,11 @@ const App = () => {
         verifiedPerson.firstName = details.firstName
         verifiedPerson.lastName = details.lastName
         newArr.push(verifiedPerson)
-        // setVerifiedAddresses((verifiedAddresses) => [...verifiedAddresses, verifiedPerson])
       })
     })
-    setVerifiedAddresses(newArr)
+    setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, newArr])
     setIsVerified(true)
   }
-
-  console.log(verifiedAddresses, "verified addresses")
 
   return (
     <Container>
@@ -83,7 +79,8 @@ const App = () => {
         <>
           {verifiedAddresses.map((address) => (
             <div>
-              {address[0].long_name} {address[1].long_name} {address[2].long_name} {address[5].long_name} {address[7].long_name}
+              {console.log(address, "address object")}
+              {address.address[0].long_name} {address.address[1].long_name} {address.address[2].long_name} {address.address[5].long_name} {address.address[7].long_name}
             </div>
           ))}
         </>
