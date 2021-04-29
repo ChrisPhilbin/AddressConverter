@@ -4,8 +4,23 @@ import Container from '@material-ui/core/Container'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Input from '@material-ui/core/Input'
+import Grid from '@material-ui/core/Grid'
+import { makeStyles } from '@material-ui/core/styles'
+
+const useStyles = makeStyles((theme) => ({
+  addressData: {
+    marginTop: '30px',
+    textAlign: 'center'
+  },
+  startHere: {
+    textAlign: 'center',
+    marginTop: '80px'
+  }
+}))
 
 const App = () => {
+
+  const classes = useStyles()
 
   let [file, setFile]                           = useState(null)
   let [verifiedAddresses, setVerifiedAddresses] = useState([])
@@ -51,24 +66,43 @@ const App = () => {
     })
   }
 
+  console.log(verifiedAddresses)
+
   return (
     <Container>
-      <Typography variant="h4">Step 1: Upload file</Typography>
-      <Input type="file" onChange={(e) => setFile(e.target.files[0]) } />
-      { file ? <Button onClick={() => handleConvert(extract)}>Convert</Button> : null}
-      {/* <Button onClick={() => verifyAddresses()}>Verify Addresses</Button> */}
-    
-      {/* { isVerified? 
-        <>
-          {verifiedAddresses.map((address) => (
-            <div>
-              {console.log(address, "address object")}
-              {address.address[0].long_name} {address.address[1].long_name} {address.address[2].long_name} {address.address[5].long_name} {address.address[7].long_name}
-            </div>
-          ))}
-        </>
-      : null } */}
 
+      <Grid container spacing={3}>
+
+        <Grid item xs={12} className={classes.startHere}>
+          { !file ?
+            <>
+              <Typography variant="h4" gutterBottom>Upload file</Typography>
+
+              <Input accept="*" id="upload-button" style={{display: 'none'}} onChange={(e) => setFile(e.target.files[0])} type="file" />
+
+              <label htmlFor="upload-button">
+                <Button variant="contained" color="primary" component="span">Upload your file</Button>
+              </label>
+            </>
+          :
+            <>
+              <Button variant="contained" color="primary" onClick={() => handleConvert(extract)}>Convert</Button>
+            </>
+          }
+        </Grid>
+
+        <Grid item xs={12} className={classes.addressData}>
+          { isVerified? 
+            <>
+              {verifiedAddresses.map((address) => (
+                <div>
+                  {address.firstName} {address.lastName} {address.address}
+                </div>
+              ))}
+            </>
+          : null }
+        </Grid>
+      </Grid>
     </Container>
   )
 }
