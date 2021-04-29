@@ -41,12 +41,20 @@ const App = () => {
     let newArr = []
     let personDetails = {}
     rows.slice(1).forEach((row) => {
+      console.log(row, "row")
       personDetails["firstName"] = row[indexValues.firstName]
       personDetails["lastName"] = row[indexValues.lastName]
       personDetails["address"] = row[indexValues.address].match(/\(([^)]+)\)/)[1]
-      newArr.push(personDetails)
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}`)
+        .then(response => response.json())
+        .then(data => {
+          personDetails["verifiedAddress"] = data.results[0].address_components
+        })
+        .then(newArr.push(personDetails))
+      console.log(personDetails, "person details")
     })
-    setRawAddresses(rawAddresses => [...rawAddresses, newArr])
+    setRawAddresses(verifiedAddresses => [...verifiedAddresses, newArr])
+    console.log(verifiedAddresses, "verified addresses")
   }
 
   // const verifyAddresses = () => {
