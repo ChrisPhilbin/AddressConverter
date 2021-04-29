@@ -8,7 +8,6 @@ import Input from '@material-ui/core/Input'
 const App = () => {
 
   let [file, setFile]                           = useState(null)
-  let [rawAddresses, setRawAddresses]           = useState([])
   let [verifiedAddresses, setVerifiedAddresses] = useState([])
   let [isVerified, setIsVerified]               = useState(false)
 
@@ -24,7 +23,6 @@ const App = () => {
   }
 
   const extract = (rows) => {
-    //first get the index values of the rows to find where firstname, lastname, address live
     let indexValues = {}
 
     rows[0].forEach((row, index) => {
@@ -38,10 +36,8 @@ const App = () => {
             indexValues.address = index
         }
     })
-    let newArr = []
     let personDetails = {}
     rows.slice(1).forEach((row) => {
-      console.log(row, "row")
       personDetails["firstName"] = row[indexValues.firstName]
       personDetails["lastName"] = row[indexValues.lastName]
       personDetails["address"] = row[indexValues.address].match(/\(([^)]+)\)/)[1]
@@ -50,29 +46,10 @@ const App = () => {
         .then(data => {
           personDetails["verifiedAddress"] = data.results[0].address_components
         })
-        .then(newArr.push(personDetails))
-      console.log(personDetails, "person details")
+        .then(setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, personDetails]))
+        .then(setIsVerified(true))
     })
-    setRawAddresses(verifiedAddresses => [...verifiedAddresses, newArr])
-    console.log(verifiedAddresses, "verified addresses")
   }
-
-  // const verifyAddresses = () => {
-  //   let verifiedPerson = {}
-  //   let newArr = []
-  //   rawAddresses.map((details) => {
-  //     fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${details.address}&key=${process.env.REACT_APP_G_API}`)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       verifiedPerson.address = data.results[0].address_components
-  //       verifiedPerson.firstName = details.firstName
-  //       verifiedPerson.lastName = details.lastName
-  //     })
-  //     .then(newArr.push(verifiedPerson))
-  //   })
-  //   setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, newArr])
-  //   setIsVerified(true)
-  // }
 
   return (
     <Container>
