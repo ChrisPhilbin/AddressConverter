@@ -70,25 +70,6 @@ const App = () => {
           console.log(result.results[0].address_components, "single result")
           setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, result.results[0].formatted_address])
         }))
-        //each time a promise resolves it returns a new array with previously resolved promises
-        //[p1]
-        //[p1, p2]
-        //[p1, p2, p3]
-        //[p1, p2, p3, p4]
-        // .then(data => personDetails["verifiedAddress"] = data)
-        // .then(setVerifiedAddresses([...verifiedAddresses, personDetails]))
-        // .then(console.log(verifiedAddresses, "verified addresses"))
-        // .then(console.log(personDetails))
-
-    //     fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}`)
-    //       .then(response => response.json())
-    //     .then(data => {
-    //       personDetails["verifiedAddress"] = data.results[0].address_components
-    //     })
-    //     .then(setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, personDetails]))
-    //     .then(setIsVerified(true))
-    // })
-
   }
   console.log(verifiedAddresses, "verified")
   return (
