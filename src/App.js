@@ -52,7 +52,6 @@ const App = () => {
         }
     })
     let personDetails = {}
-    let addressUrlArr = []
     let newArr = []
     
     rows.slice(1).map((row) => {
@@ -60,37 +59,19 @@ const App = () => {
       personDetails["firstName"] = row[indexValues.firstName]
       personDetails["lastName"] = row[indexValues.lastName]
       personDetails["address"] = row[indexValues.address].match(/\(([^)]+)\)/)[1]
-      let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}` 
-      addressUrlArr.push(url)
+      personDetails["url"] = `https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}` 
+      newArr.push(personDetails)
     })
-      Promise.all(addressUrlArr.map(url => fetch(url))).then(responses => 
+      Promise.all(newArr.map(details => fetch(details.url))).then(responses => 
         Promise.all(responses.map(res => res.json()))
+          .then(data => data.map((result) => {
+            console.log(result, "result")
+            //iterate over newArr, find where result.formatted_address matches the street address
+            setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, result.results[0].formatted_address])
+          }))
         )
-        .then(data => data.map((result) => {
-          console.log(result.results[0].address_components, "single result")
-          setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, result.results[0].formatted_address])
-        }))
-        //each time a promise resolves it returns a new array with previously resolved promises
-        //[p1]
-        //[p1, p2]
-        //[p1, p2, p3]
-        //[p1, p2, p3, p4]
-        // .then(data => personDetails["verifiedAddress"] = data)
-        // .then(setVerifiedAddresses([...verifiedAddresses, personDetails]))
-        // .then(console.log(verifiedAddresses, "verified addresses"))
-        // .then(console.log(personDetails))
-
-    //     fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}`)
-    //       .then(response => response.json())
-    //     .then(data => {
-    //       personDetails["verifiedAddress"] = data.results[0].address_components
-    //     })
-    //     .then(setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, personDetails]))
-    //     .then(setIsVerified(true))
-    // })
-
   }
-  console.log(verifiedAddresses, "verified")
+console.log(verifiedAddresses, "verified addresses")
   return (
     <Container>
 
