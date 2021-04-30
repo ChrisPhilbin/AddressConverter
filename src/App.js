@@ -62,14 +62,22 @@ const App = () => {
       personDetails["url"] = `https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}` 
       newArr.push(personDetails)
     })
-      Promise.all(newArr.map(details => fetch(details.url))).then(responses => 
-        Promise.all(responses.map(res => res.json()))
-          .then(data => data.map((result) => {
-            console.log(result, "result")
-            //iterate over newArr, find where result.formatted_address matches the street address
-            setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, result.results[0].formatted_address])
-          }))
-        )
+      newArr.forEach((details) => {
+        fetch(details.url)
+        .then(response => response.json())
+        .then(data => {
+          details["verifiedDetails"] = data
+          setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, details])
+        })
+      })
+      // Promise.all(newArr.map(details => fetch(details.url))).then(responses => 
+      //   Promise.all(responses.map(res => res.json()))
+      //     .then(data => data.map((result) => {
+      //       console.log(result, "result")
+      //       //iterate over newArr, find where result.formatted_address matches the street address
+      //       setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, result.results[0].formatted_address])
+      //     }))
+      //   )
   }
 console.log(verifiedAddresses, "verified addresses")
   return (
