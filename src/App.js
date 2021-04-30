@@ -5,6 +5,13 @@ import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Input from '@material-ui/core/Input'
 import Grid from '@material-ui/core/Grid'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableContainer from '@material-ui/core/TableContainer'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import Paper from '@material-ui/core/Paper'
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
@@ -52,7 +59,6 @@ const App = () => {
         }
     })
     let personDetails = {}
-    let addressUrlArr = []
     let newArr = []
     
     rows.slice(1).map((row) => {
@@ -60,9 +66,10 @@ const App = () => {
       personDetails["firstName"] = row[indexValues.firstName]
       personDetails["lastName"] = row[indexValues.lastName]
       personDetails["address"] = row[indexValues.address].match(/\(([^)]+)\)/)[1]
-      let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}` 
-      addressUrlArr.push(url)
+      personDetails["url"] = `https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}` 
+      newArr.push(personDetails)
     })
+<<<<<<< HEAD
       Promise.all(addressUrlArr.map(url => fetch(url))).then(responses => 
         Promise.all(responses.map(res => res.json()))
         )
@@ -70,8 +77,21 @@ const App = () => {
           console.log(result.results[0].address_components, "single result")
           setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, result.results[0].formatted_address])
         }))
+=======
+      newArr.forEach((details) => {
+        fetch(details.url)
+        .then(response => response.json())
+        .then(data => {
+          details["verifiedDetails"] = data
+          setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, details])
+          setIsVerified(true)
+        })
+      })
+>>>>>>> d02f6307c185a074af8d1ac600a11e2359e0ce94
   }
-  console.log(verifiedAddresses, "verified")
+
+  console.log(verifiedAddresses)
+
   return (
     <Container>
 
@@ -97,13 +117,34 @@ const App = () => {
 
         <Grid item xs={12} className={classes.addressData}>
           { isVerified? 
-            <>
-              {verifiedAddresses.map((address) => (
-                <div>
-                  {address.firstName} {address.lastName} {address.address}
-                </div>
-              ))}
-            </>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>First & Last name</TableCell>
+                    <TableCell align="right">Street</TableCell>
+                    <TableCell align="right">City</TableCell>
+                    <TableCell align="right">State / Province</TableCell>
+                    <TableCell align="right">Country</TableCell>
+                    <TableCell align="right">Zip / Postal code</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {verifiedAddresses.map((row) => (
+                    <TableRow key={row.firstName}>
+                      <TableCell component="th" scope="row">
+                        {row.firstName} {row.lastName}
+                      </TableCell>
+                      <TableCell align="right">{row.verifiedDetails.results[0].address_components[0].long_name} {row.verifiedDetails.results[0].address_components[1].long_name} </TableCell>
+                      <TableCell align="right">{row.verifiedDetails.results[0].address_components[2].long_name}</TableCell>
+                      <TableCell align="right">{row.verifiedDetails.results[0].address_components[4].long_name}</TableCell>
+                      <TableCell align="right">{row.verifiedDetails.results[0].address_components[5].long_name}</TableCell>
+                      <TableCell align="right">{row.verifiedDetails.results[0].address_components[6].long_name}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           : null }
         </Grid>
       </Grid>
