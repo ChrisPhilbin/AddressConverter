@@ -31,6 +31,7 @@ const App = () => {
 
   let [file, setFile]                           = useState(null)
   let [verifiedAddresses, setVerifiedAddresses] = useState([])
+  let [invalidAddresses, setInvalidAddresses]   = useState([])
   let [isVerified, setIsVerified]               = useState(false)
 
   function handleConvert(extractCallback) {
@@ -74,28 +75,36 @@ const App = () => {
     })
       newArr.forEach((details) => {
         fetch(details.url)
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === "OK") {
-            data.results[0].address_components.forEach((component) => {
-              if (component.types.includes("locality")) {
-                details["city"] = component.long_name
-              }
-              if (component.types.includes("administrative_area_level_1")) {
-                details["stateprovince"] = component.long_name
-              }
-              if (component.types.includes("country")) {
-                details["country"] = component.long_name
-              }
-              if (component.types.includes("postal_code")) {
-                details["postal_code"] = component.long_name
+        .then(response => {
+          if (response.status === 200) {
+            response.json()
+            .then(data => {
+              if (data.status === "OK") {
+                data.results[0].address_components.forEach((component) => {
+                  if (component.types.includes("locality")) {
+                    details["city"] = component.long_name
+                  }
+                  if (component.types.includes("administrative_area_level_1")) {
+                    details["stateprovince"] = component.long_name
+                  }
+                  if (component.types.includes("country")) {
+                    details["country"] = component.long_name
+                  }
+                  if (component.types.includes("postal_code")) {
+                    details["postal_code"] = component.long_name
+                  }
+                })
+                details["verifiedDetails"] = data
+                setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, details])
+                setIsVerified(true)
               }
             })
-            details["verifiedDetails"] = data
-            setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, details])
-            setIsVerified(true)
+          } else {
+            console.log("Error verifying the following set of data:", details)
+            setInvalidAddresses(invalidAddresses => [...invalidAddresses, details])
           }
         })
+
       })
   }
 
@@ -137,8 +146,8 @@ const App = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {verifiedAddresses.map((row) => (
-                    <TableRow key={row.verifiedDetails.results[0].place_id}>
+                  {verifiedAddresses.map((row, index) => (
+                    <TableRow key={index}>
                       <TableCell component="th" scope="row">
                         {row.firstName} {row.lastName}
                       </TableCell>
