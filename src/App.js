@@ -48,20 +48,20 @@ const App = () => {
     let indexValues = {}
 
     rows[0].forEach((row, index) => {
-        if (row.includes('First')) {
+        if (row.toLowerCase().includes('first')) {
             indexValues.firstName = index
         }
-        if (row.includes('Last')) {
+        if (row.toLowerCase().includes('last')) {
             indexValues.lastName = index
         }
-        if (row.includes('Other')) {
+        if (row.toLowerCase().includes('other')) {
             indexValues.address = index
         }
     })
     let personDetails = {}
     let newArr = []
     
-    rows.slice(1).map((row) => {
+    rows.slice(1).forEach((row) => {
       if (row[indexValues.address] === '' || row[indexValues.address] === null || row[indexValues.address] === undefined){
         return
       }
@@ -76,29 +76,28 @@ const App = () => {
         fetch(details.url)
         .then(response => response.json())
         .then(data => {
-          debugger;
-          data.results[0].address_components.forEach((component) => {
-            if (component.types.includes("locality")) {
-              details["city"] = component.long_name
-            }
-            if (component.types.includes("administrative_area_level_1")) {
-              details["stateprovince"] = component.long_name
-            }
-            if (component.types.includes("country")) {
-              details["country"] = component.long_name
-            }
-            if (component.types.includes("postal_code")) {
-              details["postal_code"] = component.long_name
-            }
-          })
-          details["verifiedDetails"] = data
-          setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, details])
-          setIsVerified(true)
+          if (data.status === "OK") {
+            data.results[0].address_components.forEach((component) => {
+              if (component.types.includes("locality")) {
+                details["city"] = component.long_name
+              }
+              if (component.types.includes("administrative_area_level_1")) {
+                details["stateprovince"] = component.long_name
+              }
+              if (component.types.includes("country")) {
+                details["country"] = component.long_name
+              }
+              if (component.types.includes("postal_code")) {
+                details["postal_code"] = component.long_name
+              }
+            })
+            details["verifiedDetails"] = data
+            setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, details])
+            setIsVerified(true)
+          }
         })
       })
   }
-
-  console.log(verifiedAddresses)
 
   return (
     <Container>
@@ -139,7 +138,7 @@ const App = () => {
                 </TableHead>
                 <TableBody>
                   {verifiedAddresses.map((row) => (
-                    <TableRow>
+                    <TableRow key={row.verifiedDetails.results[0].place_id}>
                       <TableCell component="th" scope="row">
                         {row.firstName} {row.lastName}
                       </TableCell>
