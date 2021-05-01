@@ -19,6 +19,10 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '30px',
     textAlign: 'center'
   },
+  addressErrors: {
+    backgroundColor: '#ffcccb',
+    borderRadius: '25px'
+  },
   startHere: {
     textAlign: 'center',
     marginTop: '80px'
@@ -33,6 +37,7 @@ const App = () => {
   let [verifiedAddresses, setVerifiedAddresses] = useState([])
   let [invalidAddresses, setInvalidAddresses]   = useState([])
   let [isVerified, setIsVerified]               = useState(false)
+  let [errors, setErrors]                       = useState(false)
 
   function handleConvert(extractCallback) {
     ExcelRenderer(file, (err, resp) => {
@@ -63,7 +68,7 @@ const App = () => {
     let newArr = []
     
     rows.slice(1).forEach((row) => {
-      if (row[indexValues.address] === '' || row[indexValues.address] === null || row[indexValues.address] === undefined){
+      if (row[indexValues.address] === '' || row[indexValues.address] === null || row[indexValues.address] === undefined || row[indexValues.address].toLowerCase().includes("test")){
         return
       }
       personDetails = {}
@@ -102,6 +107,7 @@ const App = () => {
           } else {
             console.log("Error verifying the following set of data:", details)
             setInvalidAddresses(invalidAddresses => [...invalidAddresses, details])
+            setErrors(true)
           }
         })
 
@@ -130,6 +136,17 @@ const App = () => {
             </>
           }
         </Grid>
+
+        {errors? 
+          <Grid item xs={12} className={classes.addressErrors}>
+            <h5>The following addresses could not be verified properly:</h5>
+            {invalidAddresses.map((details, index) => (
+              <li key={index}>{details.firstName} {details.lastName} {details.address}</li>
+            ))}
+          </Grid>
+        :
+          null
+        }
 
         <Grid item xs={12} className={classes.addressData}>
           { isVerified? 
