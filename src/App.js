@@ -23,6 +23,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#ffcccb',
     borderRadius: '25px'
   },
+  congratsMessage: {
+    color: 'green',
+    fontWeight: 'bold'
+  },
   startHere: {
     textAlign: 'center',
     marginTop: '80px'
@@ -132,6 +136,8 @@ const App = () => {
             </>
           :
             <>
+              <Typography variant="h4" gutterBottom>Convert your file</Typography>
+
               <Button variant="contained" color="primary" onClick={() => handleConvert(extract)}>Convert</Button>
             </>
           }
@@ -139,7 +145,7 @@ const App = () => {
 
         {errors? 
           <Grid item xs={12} className={classes.addressErrors}>
-            <h5>The following addresses could not be verified properly:</h5>
+            <h5>The following {invalidAddresses.length} address(es) could not be verified properly:</h5>
             {invalidAddresses.map((details, index) => (
               <li key={index}>{details.firstName} {details.lastName} {details.address}</li>
             ))}
@@ -150,34 +156,37 @@ const App = () => {
 
         <Grid item xs={12} className={classes.addressData}>
           { isVerified? 
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>First & Last name</TableCell>
-                    <TableCell align="right">Street</TableCell>
-                    <TableCell align="right">City</TableCell>
-                    <TableCell align="right">State / Province</TableCell>
-                    <TableCell align="right">Country</TableCell>
-                    <TableCell align="right">Zip / Postal code</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {verifiedAddresses.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell component="th" scope="row">
-                        {row.firstName} {row.lastName}
-                      </TableCell>
-                      <TableCell align="right">{row.verifiedDetails.results[0].address_components[0].long_name} {row.verifiedDetails.results[0].address_components[1].long_name} </TableCell>
-                      <TableCell align="right">{row.city}</TableCell>
-                      <TableCell align="right">{row.stateprovince}</TableCell>
-                      <TableCell align="right">{row.country}</TableCell>
-                      <TableCell align="right">{row.postal_code}</TableCell>
+            <>
+              <span className={classes.congratsMessage}>Congrats - {verifiedAddresses.length} addresses have been sucessfully converted!</span>
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>First & Last name</TableCell>
+                      <TableCell align="right">Street</TableCell>
+                      <TableCell align="right">City</TableCell>
+                      <TableCell align="right">State / Province</TableCell>
+                      <TableCell align="right">Country</TableCell>
+                      <TableCell align="right">Zip / Postal code</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {verifiedAddresses.map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell component="th" scope="row">
+                          {row.firstName} {row.lastName}
+                        </TableCell>
+                        <TableCell align="right">{row.verifiedDetails.results[0].address_components[0].long_name} {row.verifiedDetails.results[0].address_components[1].long_name} </TableCell>
+                        <TableCell align="right">{row.city}</TableCell>
+                        <TableCell align="right">{row.stateprovince}</TableCell>
+                        <TableCell align="right">{row.country}</TableCell>
+                        <TableCell align="right">{row.postal_code}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
           : null }
         </Grid>
       </Grid>
