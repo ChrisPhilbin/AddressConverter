@@ -41,7 +41,19 @@ const App = () => {
   let [verifiedAddresses, setVerifiedAddresses] = useState([])
   let [invalidAddresses, setInvalidAddresses]   = useState([])
   let [isVerified, setIsVerified]               = useState(false)
+  let [showConvertButton, setShowConvertButton] = useState(false)
   let [errors, setErrors]                       = useState(false)
+
+  const uploadFile = (file) => {
+    setFile(file)
+    setShowConvertButton(true)
+  }
+
+  const startOver = () => {
+    if (window.confirm("Are you sure?")) {
+      window.location.reload()
+    }
+  }
 
   function handleConvert(extractCallback) {
     ExcelRenderer(file, (err, resp) => {
@@ -105,6 +117,7 @@ const App = () => {
                 })
                 details["verifiedDetails"] = data
                 setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, details])
+                setShowConvertButton(false)
                 setIsVerified(true)
               }
             })
@@ -128,17 +141,25 @@ const App = () => {
             <>
               <Typography variant="h4" gutterBottom>Upload file</Typography>
 
-              <Input accept="*" id="upload-button" style={{display: 'none'}} onChange={(e) => setFile(e.target.files[0])} type="file" />
+              <Input accept="*" id="upload-button" style={{display: 'none'}} onChange={(e) => uploadFile(e.target.files[0])} type="file" />
 
               <label htmlFor="upload-button">
                 <Button variant="contained" color="primary" component="span">Upload your file</Button>
               </label>
             </>
           :
-            <>
-              <Typography variant="h4" gutterBottom>Convert your file</Typography>
+            null
+          }
 
-              <Button variant="contained" color="primary" onClick={() => handleConvert(extract)}>Convert</Button>
+          { showConvertButton ?
+              <>
+                <Typography variant="h4" gutterBottom>Convert your file</Typography>
+
+                <Button variant="contained" color="primary" onClick={() => handleConvert(extract)}>Convert</Button>
+              </>
+          :
+            <>
+              <Button vertiant="contained" color="primary" onClick={() => startOver()}>Start over</Button>
             </>
           }
         </Grid>
