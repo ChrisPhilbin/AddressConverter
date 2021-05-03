@@ -30,6 +30,12 @@ const useStyles = makeStyles((theme) => ({
   startHere: {
     textAlign: 'center',
     marginTop: '80px'
+  },
+  startOver: {
+    textAlign: 'center',
+    paddingTop: '50px',
+    marginTop: '80px',
+    marginBottom: '30px'
   }
 }))
 
@@ -131,88 +137,96 @@ const App = () => {
       })
   }
 
-  return (
-    <Container>
+  if (!isVerified) {
+    return (
+      <Container>
 
-      <Grid container spacing={3}>
+        <Grid container spacing={3}>
 
-        <Grid item xs={12} className={classes.startHere}>
-          { !file ?
-            <>
-              <Typography variant="h4" gutterBottom>Upload file</Typography>
-
-              <Input accept="*" id="upload-button" style={{display: 'none'}} onChange={(e) => uploadFile(e.target.files[0])} type="file" />
-
-              <label htmlFor="upload-button">
-                <Button variant="contained" color="primary" component="span">Upload your file</Button>
-              </label>
-            </>
-          :
-            null
-          }
-
-          { showConvertButton ?
+          <Grid item xs={12} className={classes.startHere}>
+            { !file ?
               <>
-                <Typography variant="h4" gutterBottom>Convert your file</Typography>
+                <Typography variant="h4" gutterBottom>Upload file</Typography>
 
-                <Button variant="contained" color="primary" onClick={() => handleConvert(extract)}>Convert</Button>
+                <Input accept="*" id="upload-button" style={{display: 'none'}} onChange={(e) => uploadFile(e.target.files[0])} type="file" />
+
+                <label htmlFor="upload-button">
+                  <Button variant="contained" color="primary" component="span">Upload your file</Button>
+                </label>
               </>
-          :
-            <>
-              <Button vertiant="contained" color="primary" onClick={() => startOver()}>Start over</Button>
-            </>
-          }
-        </Grid>
+            :
+              null
+            }
 
-        {errors? 
-          <Grid item xs={12} className={classes.addressErrors}>
-            <h5>The following {invalidAddresses.length} address(es) could not be verified properly:</h5>
-            {invalidAddresses.map((details, index) => (
-              <li key={index}>{details.firstName} {details.lastName} {details.address}</li>
-            ))}
+            { showConvertButton ?
+                <>
+                  <Typography variant="h4" gutterBottom>Convert your file</Typography>
+
+                  <Button variant="contained" color="primary" onClick={() => handleConvert(extract)}>Convert</Button>
+                </>
+            :
+              <>
+                <Button vertiant="contained" color="primary" onClick={() => startOver()}>Start over</Button>
+              </>
+            }
           </Grid>
-        :
-          null
-        }
 
-        <Grid item xs={12} className={classes.addressData}>
-          { isVerified? 
-            <>
-              <span className={classes.congratsMessage}>Congrats - {verifiedAddresses.length} addresses have been sucessfully converted!</span>
-              <TableContainer component={Paper}>
-                <Table className={classes.table} aria-label="simple table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>First & Last name</TableCell>
-                      <TableCell align="right">Street</TableCell>
-                      <TableCell align="right">City</TableCell>
-                      <TableCell align="right">State / Province</TableCell>
-                      <TableCell align="right">Country</TableCell>
-                      <TableCell align="right">Zip / Postal code</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {verifiedAddresses.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell component="th" scope="row">
-                          {row.firstName} {row.lastName}
-                        </TableCell>
-                        <TableCell align="right">{row.verifiedDetails.results[0].address_components[0].long_name} {row.verifiedDetails.results[0].address_components[1].long_name} </TableCell>
-                        <TableCell align="right">{row.city}</TableCell>
-                        <TableCell align="right">{row.stateprovince}</TableCell>
-                        <TableCell align="right">{row.country}</TableCell>
-                        <TableCell align="right">{row.postal_code}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </>
-          : null }
         </Grid>
-      </Grid>
-    </Container>
-  )
+      </Container>
+    )
+  } else {
+    return (
+        <Container>
+
+          <Grid container spacing={3}>
+            <Grid item xs={12} className={classes.startOver}>
+              <Button variant="contained" color="primary" onClick={() => startOver()}>Start over</Button>
+            </Grid>
+            {errors? 
+              <Grid item xs={12} className={classes.addressErrors}>
+                <h5>The following {invalidAddresses.length} address(es) could not be verified properly:</h5>
+                {invalidAddresses.map((details, index) => (
+                  <li key={index}>{details.firstName} {details.lastName} {details.address}</li>
+                ))}
+              </Grid>
+            :
+              null
+            }
+            <Grid item xs={12} className={classes.addressData}>
+                  <span className={classes.congratsMessage}>Congrats - {verifiedAddresses.length} addresses have been sucessfully converted!</span>
+                  <TableContainer component={Paper}>
+                    <Table className={classes.table} aria-label="simple table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>First & Last name</TableCell>
+                          <TableCell align="right">Street</TableCell>
+                          <TableCell align="right">City</TableCell>
+                          <TableCell align="right">State / Province</TableCell>
+                          <TableCell align="right">Country</TableCell>
+                          <TableCell align="right">Zip / Postal code</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {verifiedAddresses.map((row, index) => (
+                          <TableRow key={index}>
+                            <TableCell component="th" scope="row">
+                              {row.firstName} {row.lastName}
+                            </TableCell>
+                            <TableCell align="right">{row.verifiedDetails.results[0].address_components[0].long_name} {row.verifiedDetails.results[0].address_components[1].long_name} </TableCell>
+                            <TableCell align="right">{row.city}</TableCell>
+                            <TableCell align="right">{row.stateprovince}</TableCell>
+                            <TableCell align="right">{row.country}</TableCell>
+                            <TableCell align="right">{row.postal_code}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+            </Grid>
+        </Grid>
+      </Container>
+    )
+  }
 }
 
 export default App
