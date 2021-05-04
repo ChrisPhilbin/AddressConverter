@@ -27,6 +27,10 @@ const useStyles = makeStyles((theme) => ({
     color: 'green',
     fontWeight: 'bold'
   },
+  fatalError: {
+    textAlign: 'center',
+    backgroundColor: '#ffcccb'
+  },
   startHere: {
     textAlign: 'center',
     marginTop: '80px'
@@ -49,6 +53,7 @@ const App = () => {
   let [isVerified, setIsVerified]               = useState(false)
   let [showConvertButton, setShowConvertButton] = useState(false)
   let [errors, setErrors]                       = useState(false)
+  let [fatalError, setFatalError]               = useState(false)
 
   const uploadFile = (file) => {
     setFile(file)
@@ -65,6 +70,7 @@ const App = () => {
     ExcelRenderer(file, (err, resp) => {
       if(err){
         console.log(err)
+        setFatalError(true)
       } else {
         extractCallback(resp.rows)
       }
@@ -137,6 +143,18 @@ const App = () => {
       })
   }
 
+  if(fatalError) {
+    return (
+      <Container>
+        <Grid container spacing={3}>
+          <Grid item xs={12} className={classes.fatalError}>
+            <Typography variant="h2" gutterButton>Error: Something went wrong</Typography>
+          </Grid>
+        </Grid>
+      </Container>
+    )
+  }
+
   if (!isVerified) {
     return (
       <Container>
@@ -165,9 +183,7 @@ const App = () => {
                   <Button variant="contained" color="primary" onClick={() => handleConvert(extract)}>Convert</Button>
                 </>
             :
-              <>
-                <Button vertiant="contained" color="primary" onClick={() => startOver()}>Start over</Button>
-              </>
+              null
             }
           </Grid>
 
