@@ -107,9 +107,21 @@ const App = () => {
       newArr.push(personDetails)
     })
       newArr.forEach((details) => {
-        fetch(details.url)
+        // fetch(details.url)
+        let lookUp = {
+          address: details.address
+        }
+        console.log(details.address, "address being passed in to the post body")
+        fetch(process.env.REACT_APP_CORS + 'https://us-central1-address-converter-9254d.cloudfunctions.net/api/convert', {
+          method: 'post',
+          body: JSON.stringify(lookUp),
+          headers: {
+            'Content-Type':'application/json'
+          }
+        })
         .then(response => {
           if (response.status === 200) {
+            console.log(response.body, "response from server")
             response.json()
             .then(data => {
               if (data.status === "OK") {
