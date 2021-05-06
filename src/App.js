@@ -111,7 +111,6 @@ const App = () => {
         let lookUp = {
           address: details.address
         }
-        console.log(details.address, "address being passed in to the post body")
         fetch(process.env.REACT_APP_CORS + 'https://us-central1-address-converter-9254d.cloudfunctions.net/api/convert', {
           method: 'post',
           body: JSON.stringify(lookUp),
@@ -121,9 +120,9 @@ const App = () => {
         })
         .then(response => {
           if (response.status === 200) {
-            console.log(response.body, "response from server")
             response.json()
             .then(data => {
+              console.log(data, "data coming back")
               if (data.status === "OK") {
                 data.results[0].address_components.forEach((component) => {
                   if (component.types.includes("locality")) {
@@ -143,12 +142,14 @@ const App = () => {
                 setVerifiedAddresses(verifiedAddresses => [...verifiedAddresses, details])
                 setShowConvertButton(false)
                 setIsVerified(true)
+              } else {
+                console.log("Error verifying the following set of data:", details)
+                setInvalidAddresses(invalidAddresses => [...invalidAddresses, details])
+                setErrors(true)
               }
             })
           } else {
-            console.log("Error verifying the following set of data:", details)
-            setInvalidAddresses(invalidAddresses => [...invalidAddresses, details])
-            setErrors(true)
+            console.log("Error, something went wrong!")
           }
         })
 
