@@ -103,11 +103,9 @@ const App = () => {
       personDetails["firstName"] = row[indexValues.firstName]
       personDetails["lastName"] = row[indexValues.lastName]
       personDetails["address"] = row[indexValues.address].match(/\(([^)]+)\)/)[1]
-      personDetails["url"] = `https://maps.googleapis.com/maps/api/geocode/json?address=${personDetails.address}&key=${process.env.REACT_APP_G_API}` 
       newArr.push(personDetails)
     })
       newArr.forEach((details) => {
-        // fetch(details.url)
         let lookUp = {
           address: details.address
         }
@@ -122,7 +120,6 @@ const App = () => {
           if (response.status === 200) {
             response.json()
             .then(data => {
-              console.log(data, "data coming back")
               if (data.status === "OK") {
                 data.results[0].address_components.forEach((component) => {
                   if (component.types.includes("locality")) {
